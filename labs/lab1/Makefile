@@ -1,4 +1,5 @@
-all:
+all: task
+task: task.hs
 	ghc --make task.hs
 
 clean:

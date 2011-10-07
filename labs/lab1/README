@@ -1,1 +1,15 @@
 task: http://www.scs.stanford.edu/11au-cs240h/labs/lab1.html
+
+create a histogram of word frequencies
+
+to run do the following:
+
+1. without compilation:
+
+ cat file1 file2 file3 | runghc task.hs
+
+2. with compilation:
+ make
+ cat file1 file2 file3 | ./task
+
+
