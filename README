@@ -1,0 +1,8 @@
+This project is an attempt to participate in 
+"CS240h: Functional Systems in Haskell"
+http://www.scs.stanford.edu/11au-cs240h/
+
+all labs are usually done in an task.hs file, so to run it you should run:
+  runghc task.hs <PARAMS> 
+
+where <PARAMS> depends on the lab
