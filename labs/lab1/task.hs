@@ -12,10 +12,17 @@ main = do
 analyze :: String -> [String]
 analyze lines = strings 
     where
-        allwords = words $ map toLower lines
+        allwords = words $ map toLower $ rm_punct lines
         wordsFreq = freq allwords
         wordsFreqNorm = normalize wordsFreq
         strings = map stringRepr wordsFreqNorm
+
+rm_punct :: String -> String
+rm_punct [] = []
+rm_punct (x:xs) | is_punct(x) = ' ':rm_punct(xs)
+                | otherwise = x:rm_punct(xs)
+
+is_punct x = elem x ",.:;-!@#$%^&*()+=|]}[{`~\"?/><"
 
 freq :: [String] -> [(String, Int)]
 freq allwords = sortit  $ freq_ll allwords empty
@@ -31,10 +38,7 @@ freq_ll (word:words) acc = freq_ll words newacc
 
 normalize :: [(String, Int)] -> [(String, Int, Int)]
 normalize input = 
-    [(word, maxWord, n) | 
-        (word,c) <- input, 
-        let n = number c, 
-        n > 0 ] 
+    [(word, maxWord, n) | (word,c) <- input, let n = number c, n > 0 ] 
     where
         maxWord = maximum $ map (length.fst) input
         maxCount = (maximum $ map snd input)
