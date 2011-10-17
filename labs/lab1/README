@@ -2,14 +2,18 @@ task: http://www.scs.stanford.edu/11au-cs240h/labs/lab1.html
 
 create a histogram of word frequencies
 
-to run do the following:
+ *** COMPILE ***
+two options:
+- make
+- cabal configure && cabal build
+
+
+ *** RUN ***
 
 1. without compilation:
-
  cat file1 file2 file3 | runghc task.hs
 
-2. with compilation:
- make
+2. compiled:
  cat file1 file2 file3 | ./task
 
 
