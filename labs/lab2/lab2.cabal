@@ -1,0 +1,21 @@
+name:                gliush-cs240h-lab2
+version:             1.0
+synopsis:            Word frequency counting
+description:         
+    .
+    Lab 1: http://www.scs.stanford.edu/11au-cs240h/labs/lab2.html
+    .
+Author:              Ivan Glushkov
+homepage:            https://github.com/gliush/
+build-type:          Simple
+cabal-version:       >=1.8
+
+source-repository head
+   type:       git
+   location:   https://github.com/gliush
+
+executable task
+   main-is:          task.hs
+   hs-source-dirs:   .
+   build-depends:    base           >= 4 && < 5,
+                     containers     >= 0 && < 1

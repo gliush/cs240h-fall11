@@ -1,0 +1,9 @@
+task: http://www.scs.stanford.edu/11au-cs240h/labs/lab2.html
+
+create a histogram of word frequencies
+
+ *** COMPILE ***
+two options:
+- make
+- cabal configure && cabal build
+
