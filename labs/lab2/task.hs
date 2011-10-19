@@ -1,33 +1,62 @@
-import Data.List(sort)
 import Test.QuickCheck
-import Data.List (permutations)
+import Data.List (permutations, sort)
+import Control.Monad(liftM2)
 import Control.Exception (assert)
 import Data.Bits (shift)
+import Data.Ix (inRange)
 
 type LHV = Int
+
 newtype Point = Point (Int,Int)
   deriving (Show)
 
 newtype Rect = Rect (Point,Point)
   deriving (Show)
 
+x,y :: Point -> Int
+x (Point (a,b)) = a
+y (Point (a,b)) = b
+
+-- bottom-left + top-right
+bl,tr :: Rect -> Point
+bl (Rect (p1,p2)) = p1
+tr (Rect (p1,p2)) = p2
+
+blx,bly,trx,try :: Rect -> Int
+blx = x . bl
+bly = y . bl
+trx = x . tr
+try = y . tr
+
+size :: Rect -> Int
+size r = (sizex == sizey) `assert` sizex
+  where
+    sizex = trx r - blx r
+    sizey = try r - bly r
+
+instance Arbitrary Point where
+  arbitrary = liftM2 (curry Point) arbitrary arbitrary
+
+instance Arbitrary Rect where
+  arbitrary = liftM2 mkRect arbitrary arbitrary
+
+mkRect :: Point -> Int -> Rect
+mkRect p1 size = Rect (p1,b)
+  where
+    b = Point (x p1 + size, y p1 + size)
+
+
 class Foldable a where
   folded :: a -> Rect -> Bool
 
-size :: Rect -> Int
-size (Rect (p1,p2)) = x2 - x1
-  where 
-    Point (x1,_) = p1
-    Point (x2,_) = p2
-
 instance Foldable Point where
-  folded (Point (x,y)) (Rect (Point (x1,y1),Point (x2,y2))) = xfit && yfit
+  folded p r = xfit && yfit
     where
-      xfit = x >= x1 && x <= x2
-      yfit = y >= y1 && y <= y2
+      xfit = inRange (blx r, trx r) $ x p 
+      yfit = inRange (bly r, try r) $ y p
 
 instance Foldable Rect where
-  folded (Rect (p1,p2))  rect = p1 `folded` rect && p2 `folded` rect
+  folded r1 r2 = bl r1 `folded` r2 && tr r1 `folded` r2
 
 type Obj = Rect
 type MBR = Rect
@@ -60,8 +89,11 @@ calc_lhv = undefined
 
 -- http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves
 
-r8 = Rect (Point(0,0), Point(8,8))
-r1 = Rect (Point(0,0), Point(1,1))
+p0 = Point (0,0)
+p1 = Point (1,1)
+p8 = Point (8,8)
+r8 = Rect (p0, p8)
+r1 = Rect (p0, p1)
 
 get_quoters :: Rect -> [Rect]
 get_quoters (Rect (Point(x1,y1), Point(x2,y2))) = [r0, r1, r2, r3]
@@ -73,8 +105,19 @@ get_quoters (Rect (Point(x1,y1), Point(x2,y2))) = [r0, r1, r2, r3]
     r2 = Rect (Point(xm,ym), Point(x2,y2))
     r3 = Rect (Point(xm,y1), Point(x2,ym))
 
-prop_point_in_one_quoter :: Point -> Rect -> Bool
-prop_point_in_one_quoter point rect = undefined
+prop_folded_rect :: Rect -> Rect -> Bool
+prop_folded_rect r1 r2 = r1 `folded` r2 == myFolded 
+  where
+    x_folded = blx r1 >= blx r2 && trx r1 <= trx r2
+    y_folded = bly r1 >= bly r2 && try r1 <= try r2
+    myFolded = x_folded && y_folded
+
+prop_point_in_one_quoter :: Point -> Rect -> Property
+prop_point_in_one_quoter point rect = 
+  (size rect >= 2) ==> length qs_with_point <= 1
+  where
+    qs = get_quoters rect
+    qs_with_point = filter (\q -> point `folded` q) qs
   
   
   
